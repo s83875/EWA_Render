@@ -1,61 +1,39 @@
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 3001;
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
 
-app.get("/", (req, res) => res.type('html').send(html));
+// Preise Buecher
+var SELF_PHP_PRICE = 25.4;
+var PHP_REF_PRICE = 18;
+var PHP_COOKBOOK_PRICE = 39;
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+// Create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-server.keepAliveTimeout = 120 * 1000;
-server.headersTimeout = 120 * 1000;
+app.use(express.static('public'));
+app.get('/bestellg0.html', function (req, res) {
+   res.sendFile(__dirname + "/" + "bestellg0.html");
+})
 
-const html = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Hello from Render!</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          disableForReducedMotion: true
-        });
-      }, 500);
-    </script>
-    <style>
-      @import url("https://p.typekit.net/p.css?s=1&k=vnd5zic&ht=tk&f=39475.39476.39477.39478.39479.39480.39481.39482&a=18673890&app=typekit&e=css");
-      @font-face {
-        font-family: "neo-sans";
-        src: url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-        font-style: normal;
-        font-weight: 700;
-      }
-      html {
-        font-family: neo-sans;
-        font-weight: 700;
-        font-size: calc(62rem / 16);
-      }
-      body {
-        background: white;
-      }
-      section {
-        border-radius: 1em;
-        padding: 1em;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <section>
-      Hello from Render!
-    </section>
-  </body>
-</html>
-`
+app.post('/calculate', urlencodedParser, function (req, res) {
+    // Prepare output in JSON format
+    var SELF_PHP_AMOUNT = parseInt(req.body.self_php);
+    var PHP_RREF_AMOUNT = parseInt(req.body.php_referenz);
+    var PHP_COOKBOOK_AMOUNT = parseInt(req.body.php_kochbuch);
+
+    // Berechnung des Gesamtpreises
+    var total = SELF_PHP_AMOUNT * SELF_PHP_PRICE + PHP_RREF_AMOUNT * PHP_REF_PRICE + PHP_COOKBOOK_AMOUNT * PHP_COOKBOOK_PRICE;
+
+    res.send(total.toString());
+})
+
+app.use(function (request, response) {  // Fehlerbehandlung
+ response.status(404).send("Seite nicht gefunden!");
+});
+
+var server = app.listen(8081, function () {
+   var host = server.address().address
+   var port = server.address().port
+
+   console.log("Example app listening at http://%s:%s", host, port)
+})
