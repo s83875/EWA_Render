@@ -31,9 +31,10 @@ app.use(function (request, response) {  // Fehlerbehandlung
  response.status(404).send("Seite nicht gefunden!");
 });
 
-var server = app.listen(8081, function () {
-   var host = server.address().address
-   var port = server.address().port
+// Set the port to the environment variable PORT, or 8081 if it's not set
+var port = process.env.PORT || 8081;
 
-   console.log("Example app listening at http://%s:%s", host, port)
+var server = app.listen(port, function () {
+   var host = server.address().address;
+   console.log("Example app listening at http://%s:%s", host, port);
 })
